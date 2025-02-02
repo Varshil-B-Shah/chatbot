@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template,send_from_directory
 from gen import calculate_accuracyscore, getfeedback, getnextquestion
 from werkzeug.utils import secure_filename
 import os
@@ -79,6 +79,10 @@ def gd():
 @app.route('/mock_interview')
 def mock_interview():
     return render_template('mock_interview.html', prev_question=prev_question, accuracy_score=0)  # Initialize accuracy_score to 0 or any default value
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico')
 
 @app.route('/ask', methods=['POST'])
 def ask_question():
