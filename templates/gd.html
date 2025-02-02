@@ -19,15 +19,14 @@
         .chat-container {
             width: 90%;
             margin-top: 5vh;
-            height: 85vh; 
+            height: 90vh; /* 90% of the viewport height */
             background: rgba(36, 36, 62, 0.8);
             border-radius: 20px;
-            padding: 30px 30px;
+            padding: 20px;
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.6);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            
+            justify-content: space-between;
         }
         .chat-title {
             margin-bottom: 20px;
@@ -87,7 +86,7 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: inset 0 0 10px rgba(0, 123, 255, 0.6);
             transition: border-color 0.2s ease-in-out;
-        
+            /* background: rgba(15, 15, 40, 0.7); */
             color: #f0f0f0;
         }
         .response-box input:focus {
@@ -119,53 +118,103 @@
         }
         .topbar {
             background: rgba(0, 0, 0, 0.7);
-            padding: 1em 5em;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
-            height: 10vh;
             z-index: 1000;
             width: 100%;
         }
         .logo {
-            font-size: 3rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #fff;
         }
         .tagline {
-            font-size: 2rem;
+            font-size: 1rem;
             color: #ccc;
+        }
+        .turn-indicator {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #4CAF50;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .speaking-status {
+            font-size: 0.9em;
+            color: #FFA500;
+            font-style: italic;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .typing-animation {
+            overflow: hidden;
+            white-space: pre-wrap;
+            animation: typing 0.05s steps(1);
+        }
+
+        .message.generating {
+            position: relative;
+        }
+
+        .message.generating::after {
+            content: "...";
+            position: absolute;
+            right: 10px;
+            animation: ellipsis 1.5s infinite;
+        }
+
+        @keyframes ellipsis {
+            0% { content: "."; }
+            33% { content: ".."; }
+            66% { content: "..."; }
         }
     </style>
 </head>
 <body style="display: block;">
 
-    <div class="topbar">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <img src="/static/logo.png" alt="logo" width="100" height="90">
-            <div class="logo">SkillSphere</div>
-        </div>
-            <div class="tagline">Your Gateway to Succes</div>
-    </div>
+<div class="topbar">
+    <div class="logo">SimPortal</div>
+    <div class="tagline">Your Gateway to Success</div>
+</div>
 
 <div class="container chat-container" style=" padding-top: 0%; margin-top: 6px;"> 
 
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <a href="{{ url_for('index') }}" class="back-link" style="margin: 0;"> Back </a>
+        <a href="{{ url_for('index') }}" class="back-link" style="margin: 0;">⬅Go Back</a>
         <div class="chat-title" style="color: yellow; font-size: 36px; padding:0; margin: 0 auto; text-align: center; width: 90%;">Group Discussion Simulation</div>
     </div>
     
     <!-- Topic Display -->
     <div id="topic-display" class="chat-title"></div>
     
+    <!-- Turn Indicator -->
+    <div id="turn-indicator" class="turn-indicator">
+        <div id="current-turn">User's turn to speak</div>
+        <div id="speaking-status" class="speaking-status"></div>
+    </div>
+
     <!-- Chat Box for LLMs and User -->
     <div id="chat-box" class="chat-box">
         <!-- Initial Messages (LLM) -->
-        <div class="message message-llm">
-            <strong>Host:</strong> Hi, Let's discuss. You first!
-        </div>
+        <!-- <div class="message message-llm">
+            <strong>LLM:</strong> Hi, I'm LLM. Let's discuss!
+        </div> -->
     </div>
 
     <!-- Response Input Section -->
