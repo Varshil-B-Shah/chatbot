@@ -19,14 +19,14 @@
         .chat-container {
             width: 90%;
             margin-top: 5vh;
-            height: 90vh; /* 90% of the viewport height */
+            height: 85vh; /* 90% of the viewport height */
             background: rgba(36, 36, 62, 0.8);
             border-radius: 20px;
-            padding: 20px;
+            padding: 30px 30px;
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.6);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
         }
         .chat-title {
             margin-bottom: 20px;
@@ -118,7 +118,7 @@
         }
         .topbar {
             background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
+            padding: 5em 5em;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -128,12 +128,12 @@
             width: 100%;
         }
         .logo {
-            font-size: 1.5rem;
+            font-size: 3rem;
             font-weight: bold;
             color: #fff;
         }
         .tagline {
-            font-size: 1rem;
+            font-size: 2rem;
             color: #ccc;
         }
         .turn-indicator {
@@ -189,9 +189,12 @@
 <body style="display: block;">
 
 <div class="topbar">
-    <div class="logo">SimPortal</div>
-    <div class="tagline">Your Gateway to Success</div>
-</div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <img src="/static/logo.png" alt="logo" width="100" height="90">
+            <div class="logo">SkillSphere</div>
+        </div>
+            <div class="tagline">Your Gateway to Succes</div>
+    </div>
 
 <div class="container chat-container" style=" padding-top: 0%; margin-top: 6px;"> 
 
