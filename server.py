@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure the Google Generative AI API key
+# my_api_key = os.getenv("GOOGLE_GENERATIVE_AI_API_KEY")
 my_api_key = "AIzaSyCqNEgWQrilgTWFy7NKzlHTOQfVRCt-KKI"
 genai.configure(api_key=my_api_key)
 
@@ -144,25 +145,122 @@ def upload_audio():
 @app.route('/generate_gemini_response', methods=['POST'])
 def generate_gemini_response():
     data = request.json
-    user_input = data.get('user_input', '').strip().lower()
+    user_input = data.get('user_input', '')
     topic = data.get('topic', chosen_topic)
-
-    # Check if the user wants to end the discussion
-    if user_input == "end":
-        context = f"The group discussion on the topic: {topic} has ended. Please provide a constructive and analytical feedback on the user's participation. Highlight strengths and areas of improvement in a balanced manner. Keep it concise and professional."
-        response = get_gemini_response(user_input, context)
-        return jsonify({"response": response})
 
     # Check if the user's input is on topic
     if not is_on_topic(user_input, topic):
         return jsonify({"response": "Your response seems to be off-topic. Please stick to the topic."})
 
-    # Set the context for argument-based discussion
-    context = f"A group discussion is being held on the topic: {topic}. The user will speak first. You are supposed to argue with the user. Reply in 50 to 100 words only.If user writes end then give feedback about users participation."
+    # Set the context for the discussion
+    context = f"A group discussion is being held on the topic: {topic}. The user will speak first. You are supposed to argue with the user. Reply in 300 to 300 words only."
 
     # Get Gemini's response that includes an argument
     response = get_gemini_response(user_input, context)
     return jsonify({"response": response})
+
+# Initialize conversation history
+conversation_history = []
+
+# Add this variable after initializing conversation_history
+last_speaker = None
+
+def clean_response(personality_name, response):
+    patterns = [
+        f"{personality_name}: ",
+        f"{personality_name} - ",
+        f"({personality_name}) ",
+        f"{personality_name}: ({personality_name}) ",
+        f"{personality_name} says: ",
+    ]
+    
+    cleaned_response = response
+    for pattern in patterns:
+        if cleaned_response.startswith(pattern):
+            cleaned_response = cleaned_response[len(pattern):]
+    
+    # Remove name if it's in parentheses anywhere in the text
+    import re
+    cleaned_response = re.sub(f"\\({personality_name}\\) *", "", cleaned_response)
+    
+    return cleaned_response.strip()
+
+@app.route('/generate_group_response', methods=['POST'])
+def generate_group_response():
+    global last_speaker
+    data = request.json
+    user_input = data.get('user_input', '')
+    topic = data.get('topic', chosen_topic)
+    initial_input = user_input
+
+    # Add user message to conversation history
+    conversation_history.append({
+        "role": "user",
+        "content": user_input
+    })
+    
+    # Get available speakers
+    llm_personalities = [
+        {"name": "ALICE", "style": "analytical and data-driven"},
+        {"name": "BOB", "style": "creative and innovative but always wants to counter-argue"},
+        {"name": "CHARLIE", "style": "practical and solution-oriented"}
+    ]
+
+    # Randomly shuffle personalities to randomize who speaks first
+    random.shuffle(llm_personalities)
+    
+    # Select 1-2 personalities for this round
+    num_speakers = random.randint(1, 2)
+    selected_personalities = llm_personalities[:num_speakers]
+
+    responses = []
+    last_response = initial_input
+
+    for i, personality in enumerate(selected_personalities):
+        # Each subsequent LLM responds to the previous LLM's response
+        input_text = last_response
+
+        context = f"""
+        A group discussion is being held on the topic: {topic}.
+        You are {personality['name']}, who is {personality['style']}.
+        Previous conversation:
+        {format_conversation_history()}
+        
+        {"Initial user message" if i == 0 else "Previous response"}: {input_text}
+        
+        Respond to this {"message" if i == 0 else "response"} while considering the discussion context.
+        Keep your response under 100 words.
+        """
+
+        response = get_gemini_response(input_text, context)
+        # Clean the response before adding to responses list
+        cleaned_response = clean_response(personality["name"], response)
+        last_response = cleaned_response  # Update last_response for the next LLM
+
+        responses.append({
+            "name": personality["name"],
+            "content": cleaned_response,
+            "delay": 1.0
+        })
+        
+        # Add cleaned response to conversation history
+        conversation_history.append({
+            "role": "assistant",
+            "name": personality["name"],
+            "content": cleaned_response
+        })
+        last_speaker = personality["name"]
+
+    return jsonify({"responses": responses})
+
+def format_conversation_history():
+    formatted = []
+    for msg in conversation_history[-6:]:  
+        if msg["role"] == "user":
+            formatted.append(f"User: {msg['content']}")
+        else:
+            formatted.append(f"{msg['name']}: {msg['content']}")
+    return "\n".join(formatted)
 
 if __name__ == '__main__':
     app.run(debug=True)
