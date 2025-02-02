@@ -10,71 +10,61 @@
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             font-family: Arial, sans-serif;
             color: #f0f0f0;
-            height: 100%;
+            height: 100vh;
             margin: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+        }
+        .topbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tagline {
+            font-size: 1.2rem;
+            color: #ccc;
         }
         .chat-container {
             width: 90%;
-            margin-top: 5vh;
-            height: 85vh; 
+            margin-top: 60px;
+            height: 85vh;
             background: rgba(36, 36, 62, 0.8);
             border-radius: 20px;
-            padding: 30px 30px;
+            padding: 20px;
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.6);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            
         }
         .chat-title {
-            margin-bottom: 20px;
             font-size: 1.8rem;
             font-weight: bold;
             text-align: center;
             color: rgba(0,123,255,0.8);
+            margin-bottom: 10px;
         }
         .chat-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
             flex-grow: 1;
             overflow-y: auto;
-            margin-bottom: 20px;
             border: 1px solid rgba(0, 123, 255, 0.3);
             border-radius: 10px;
             padding: 10px;
             background: rgba(255, 255, 255, 0.1);
-        }
-        .message {
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 20px;
-            word-wrap: break-word;
-            margin: 5px 0;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        .message-llm {
-            background-color: rgba(0, 123, 255, 0.5);
-            align-self: flex-start;
-            border: 1px solid rgba(0, 123, 255, 0.8);
-        }
-        .message-user {
-            background-color: rgba(255, 255, 255, 0.3);
-            align-self: flex-end;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         .response-box {
             display: flex;
@@ -85,14 +75,8 @@
             border-radius: 20px;
             padding: 10px 15px;
             border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: inset 0 0 10px rgba(0, 123, 255, 0.6);
-            transition: border-color 0.2s ease-in-out;
-        
             color: #f0f0f0;
-        }
-        .response-box input:focus {
-            border-color: rgba(0,123,255,0.8);
-            outline: none;
+            background: rgba(15, 15, 40, 0.7);
         }
         .response-box button {
             border-radius: 20px;
@@ -100,80 +84,26 @@
             background: linear-gradient(135deg, rgba(0,123,255,0.8), rgba(255,99,71,0.8));
             color: #fff;
             border: none;
-            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.4);
-            transition: background-color 0.2s ease-in-out;
-        }
-        .response-box button:hover {
-            background: linear-gradient(135deg, rgba(255,99,71,0.8), rgba(0,123,255,0.8));
-        }
-
-        ::-webkit-scrollbar{
-            display: none;
-        }
-        .back-link {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        .topbar {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 1em 5em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            height: 10vh;
-            z-index: 1000;
-            width: 100%;
-        }
-        .logo {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #fff;
-        }
-        .tagline {
-            font-size: 2rem;
-            color: #ccc;
         }
     </style>
 </head>
-<body style="display: block;">
-
+<body>
     <div class="topbar">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <img src="/static/logo.png" alt="logo" width="100" height="90">
-            <div class="logo">SkillSphere</div>
+        <div class="logo">
+            <img src="/static/logo.png" alt="logo" width="50" height="50">
+            SkillSphere
         </div>
-            <div class="tagline">Your Gateway to Succes</div>
+        <div class="tagline">Your Gateway to Success</div>
     </div>
-
-<div class="container chat-container" style=" padding-top: 0%; margin-top: 6px;"> 
-
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <a href="{{ url_for('index') }}" class="back-link" style="margin: 0;"> Back </a>
-        <div class="chat-title" style="color: yellow; font-size: 36px; padding:0; margin: 0 auto; text-align: center; width: 90%;">Group Discussion Simulation</div>
-    </div>
-    
-    <!-- Topic Display -->
-    <div id="topic-display" class="chat-title"></div>
-    
-    <!-- Chat Box for LLMs and User -->
-    <div id="chat-box" class="chat-box">
-        <!-- Initial Messages (LLM) -->
-        <div class="message message-llm">
-            <strong>Host:</strong> Hi, Let's discuss. You first!
+    <div class="container chat-container"> 
+        <div class="chat-title">Group Discussion Simulation</div>
+        <div id="topic-display" class="chat-title"></div>
+        <div id="chat-box" class="chat-box"></div>
+        <div class="response-box">
+            <input type="text" id="user-input" placeholder="Type your response here..." />
+            <button id="submit-response">Send</button>
         </div>
     </div>
-
-    <!-- Response Input Section -->
-    <div class="response-box">
-        <input type="text" id="user-input" class="form-control" placeholder="Type your response here..." />
-        <button class="btn" id="submit-response">Send</button>
-    </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
