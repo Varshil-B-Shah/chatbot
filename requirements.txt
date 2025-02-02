@@ -1,0 +1,8 @@
+Flask
+requests
+google-generativeai
+python-dotenv
+librosa
+scikit-learn
+joblib
+gunicorn
